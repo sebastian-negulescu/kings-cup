@@ -35,7 +35,7 @@ io.on('connection', socket => {
     });
 
     socket.on('change name', data => {
-        players[socket.id] = data.name;
+        players[socket.id].name = data.name;
         emitPlayers();
     });
 
