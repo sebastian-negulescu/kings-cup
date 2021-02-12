@@ -6,9 +6,7 @@ socket.on('players', data => {
     console.log(data);
     let playerNames = '';
     for (const player in data) {
-        if (data[player].name) {
-            playerNames += `<li>${data[player].name}</li>`;
-        }
+        playerNames += `<li>${data[player].name}</li>`;
     }
     document.querySelector('.players').innerHTML = playerNames;
 });
@@ -21,3 +19,7 @@ const sendName = () => {
     const name = document.querySelector('input').value;
     socket.emit('change name', {name: name});
 };
+
+const startGame = () => {
+    socket.emit('start game');
+}
