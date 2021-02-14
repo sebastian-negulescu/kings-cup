@@ -1,15 +1,8 @@
-let deck = new Array(52);
-let ind = 0;
-for (let i = 0; i < 13; ++i) {
-    for (let j = 0; j < 4; ++j) {
-        deck[ind] = i + 1;
-        ++ind;
-    }
-}
-let playerList = [];
-let turn = 0;
+let deck;
+let playerList;
+let turn;
 
-const shuffle = array => {
+const shuffle = array => { // taken from stackoverflow
     let currentIndex = array.length, temporaryValue, randomIndex;
   
     // While there remain elements to shuffle...
@@ -28,11 +21,42 @@ const shuffle = array => {
     return array;
 };
 
-export function init(players) {
-    console.log(players);
-    console.log(deck);
-    playerList = players;
-    // shuffle the deck
-    shuffle(deck);
-    console.log(deck);
-}
+const removeCard = () => {
+    turn = (turn + 1) % playerList.length;
+
+    if (deck.length <= 0) {
+        return 0;
+    }
+    return deck.pop();
+};
+
+module.exports = {
+    init: players => {
+        deck = new Array(52);
+        let ind = 0;
+        for (let i = 0; i < 13; ++i) {
+            for (let j = 0; j < 4; ++j) {
+                deck[ind] = i + 1;
+                ++ind;
+            }
+        }
+        playerList = players;
+
+        console.log(players);
+        console.log(deck);
+
+        // shuffle the deck
+        shuffle(deck);
+        console.log(deck);
+
+        turn = 0;
+    },
+
+    draw: player => {
+        if (player !== playerList[turn].id) {
+            return {cardValue: -1, playerTurn: playerList[turn].name};
+        }
+        
+        return {cardValue: removeCard(), playerTurn: playerList[turn].name};
+    }
+};

@@ -23,7 +23,11 @@ let players = [];
 let leader = null;
 const emitPlayers = () => { // send out players to all devices
     io.sockets.emit('players', players);
-}
+};
+
+const emitTurn = turn => {
+    io.sockets.emit('turn', turn);
+};
 
 io.on('connection', socket => {
     socket.on('new player', () => {
@@ -32,7 +36,7 @@ io.on('connection', socket => {
             name: socket.id,
         });
         if (!leader) {
-            leader = socket.id;
+            leader = players[0].id;
         }
         emitPlayers();
     });
@@ -48,11 +52,23 @@ io.on('connection', socket => {
 
     socket.on('start game', () => {
         if (leader === socket.id) {
+            io.sockets.emit('clear board');
             game.init(players);
+            emitTurn(players[0].name);
         } else {
             socket.emit('start game error', {
-                reason: 'only the session leader can start the game'
+                reason: 'only the session leader can start the game',
             });
+        }
+    });
+
+    socket.on('draw', () => {
+        const {cardValue, playerTurn} = game.draw(socket.id);
+        if (cardValue === 0) {
+            io.sockets.emit('game over');
+        } else {
+            io.sockets.emit('card', cardValue);
+            emitTurn(playerTurn);
         }
     });
 
